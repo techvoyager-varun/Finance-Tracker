@@ -1,7 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { useDashboard } from "@/context/DashboardContext";
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
-import { useMemo } from "react";
+import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { fmtShort } from "@/lib/currency";
 const COLORS = [
   "hsl(217, 91%, 60%)",
@@ -14,7 +14,9 @@ const COLORS = [
   "hsl(30, 80%, 55%)",
 ];
 const SpendingBreakdownChart = () => {
-  const { transactions, theme } = useDashboard();
+  const { transactions } = useDashboard();
+  const [selectedIndex, setSelectedIndex] = useState(null);
+  const pieContainerRef = useRef(null);
   const data = useMemo(() => {
     const map = {};
     transactions
@@ -30,6 +32,36 @@ const SpendingBreakdownChart = () => {
       .sort((a, b) => b.value - a.value);
   }, [transactions]);
   const total = useMemo(() => data.reduce((s, d) => s + d.value, 0), [data]);
+  useEffect(() => {
+    if (data.length === 0) {
+      setSelectedIndex(null);
+      return;
+    }
+    setSelectedIndex((prev) =>
+      prev !== null && prev < data.length ? prev : null,
+    );
+  }, [data]);
+  useEffect(() => {
+    if (selectedIndex === null) return;
+
+    const handleOutsideClick = (event) => {
+      if (!pieContainerRef.current?.contains(event.target)) {
+        setSelectedIndex(null);
+      }
+    };
+
+    document.addEventListener("pointerdown", handleOutsideClick);
+    return () =>
+      document.removeEventListener("pointerdown", handleOutsideClick);
+  }, [selectedIndex]);
+  const selectedItem =
+    selectedIndex !== null && selectedIndex < data.length
+      ? data[selectedIndex]
+      : null;
+  const selectedPct =
+    selectedItem && total > 0
+      ? ((selectedItem.value / total) * 100).toFixed(1)
+      : "0";
   return (
     <Card className="p-4 sm:p-5 card-shadow animate-fade-in h-full">
       <div className="flex items-center justify-between mb-4">
@@ -46,7 +78,10 @@ const SpendingBreakdownChart = () => {
         </div>
       ) : (
         <div className="flex flex-col items-center gap-3">
-          <div className="w-full h-[180px] sm:h-[200px]">
+          <div
+            ref={pieContainerRef}
+            className="w-full h-[180px] sm:h-[200px] spending-pie-chart"
+          >
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
@@ -57,25 +92,24 @@ const SpendingBreakdownChart = () => {
                   outerRadius={75}
                   paddingAngle={3}
                   dataKey="value"
+                  rootTabIndex={-1}
+                  onClick={(_, index) => setSelectedIndex(index)}
                 >
                   {data.map((_, i) => (
                     <Cell key={i} fill={COLORS[i % COLORS.length]} />
                   ))}
                 </Pie>
-                <Tooltip
-                  formatter={(v) => [fmtShort(v), undefined]}
-                  contentStyle={{
-                    fontSize: "12px",
-                    border: `1px solid ${theme === "dark" ? "hsl(220, 20%, 20%)" : "hsl(220, 13%, 91%)"}`,
-                    backgroundColor:
-                      theme === "dark"
-                        ? "hsl(222, 47%, 11%)"
-                        : "hsl(0, 0%, 100%)",
-                  }}
-                />
               </PieChart>
             </ResponsiveContainer>
           </div>
+          {selectedItem && (
+            <div className="w-full rounded-md border border-border/60 bg-muted/40 px-2.5 py-1.5 text-xs text-muted-foreground">
+              <span className="font-medium text-card-foreground">
+                {selectedItem.name}
+              </span>{" "}
+              - {fmtShort(selectedItem.value)} ({selectedPct}%)
+            </div>
+          )}
           <div className="w-full space-y-1.5 max-h-[120px] overflow-y-auto overflow-x-hidden pr-1">
             {data.map((item, i) => {
               const pct =

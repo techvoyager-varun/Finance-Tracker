@@ -36,7 +36,7 @@ const BalanceTrendChart = () => {
             margin={{
               top: 5,
               right: 5,
-              left: -20,
+              left: 8,
               bottom: 0,
             }}
           >
@@ -81,9 +81,10 @@ const BalanceTrendChart = () => {
                 fontSize: 11,
                 fill: tickColor,
               }}
+              tickMargin={8}
               axisLine={false}
               tickLine={false}
-              width={40}
+              width={56}
             />
             <Tooltip
               contentStyle={{

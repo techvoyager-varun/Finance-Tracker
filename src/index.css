@@ -188,4 +188,10 @@
   .overflow-y-auto::-webkit-scrollbar-thumb:hover {
     background: hsl(var(--muted-foreground) / 0.4);
   }
+
+  .spending-pie-chart .recharts-wrapper:focus,
+  .spending-pie-chart .recharts-surface:focus,
+  .spending-pie-chart .recharts-sector:focus {
+    outline: none;
+  }
 }

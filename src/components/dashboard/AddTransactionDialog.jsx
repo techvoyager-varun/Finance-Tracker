@@ -32,10 +32,12 @@ const AddTransactionDialog = ({ open, onOpenChange, transaction }) => {
     if (typeof dateInput.showPicker === "function") {
       try {
         dateInput.showPicker();
-      } catch {}
+      } catch {
+        return;
+      }
     }
   };
-  const isEditMode = !!transaction;
+  const isEditMode = Boolean(transaction);
   const resetForm = () => {
     setType("expense");
     setDescription("");

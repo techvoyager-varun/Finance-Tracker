@@ -39,7 +39,9 @@ const TransactionsTable = () => {
     if (typeof dateInput.showPicker === "function") {
       try {
         dateInput.showPicker();
-      } catch {}
+      } catch {
+        return;
+      }
     }
   };
   const openDatePickerFromRef = (input) => {
@@ -49,7 +51,9 @@ const TransactionsTable = () => {
     if (typeof pickerInput.showPicker === "function") {
       try {
         pickerInput.showPicker();
-      } catch {}
+      } catch {
+        return;
+      }
     }
   };
   const hasActiveFilters =
@@ -150,14 +154,22 @@ const TransactionsTable = () => {
             placeholder="Search..."
             value={filters.search}
             onChange={(e) =>
-              setFilters((f) => ({ ...f, search: e.target.value }))
+              setFilters((f) => ({
+                ...f,
+                search: e.target.value,
+              }))
             }
             className="pl-8 h-8 text-xs bg-background"
           />
         </div>
         <Select
           value={filters.type}
-          onValueChange={(v) => setFilters((f) => ({ ...f, type: v }))}
+          onValueChange={(v) =>
+            setFilters((f) => ({
+              ...f,
+              type: v,
+            }))
+          }
         >
           <SelectTrigger className="w-full sm:w-[110px] h-8 text-xs bg-background">
             <SelectValue placeholder="Type" />
@@ -170,7 +182,12 @@ const TransactionsTable = () => {
         </Select>
         <Select
           value={filters.category}
-          onValueChange={(v) => setFilters((f) => ({ ...f, category: v }))}
+          onValueChange={(v) =>
+            setFilters((f) => ({
+              ...f,
+              category: v,
+            }))
+          }
         >
           <SelectTrigger className="w-full sm:w-[130px] h-8 text-xs bg-background">
             <SelectValue placeholder="Category" />
@@ -192,10 +209,13 @@ const TransactionsTable = () => {
               type="date"
               value={filters.dateFrom}
               onChange={(e) =>
-                setFilters((f) => ({ ...f, dateFrom: e.target.value }))
+                setFilters((f) => ({
+                  ...f,
+                  dateFrom: e.target.value,
+                }))
               }
               onClick={openNativeDatePicker}
-              max={filters.dateTo || void 0}
+              max={filters.dateTo || undefined}
               className="date-field-input h-8 w-full bg-background pr-8 text-xs"
             />
             <Button
@@ -215,10 +235,13 @@ const TransactionsTable = () => {
               type="date"
               value={filters.dateTo}
               onChange={(e) =>
-                setFilters((f) => ({ ...f, dateTo: e.target.value }))
+                setFilters((f) => ({
+                  ...f,
+                  dateTo: e.target.value,
+                }))
               }
               onClick={openNativeDatePicker}
-              min={filters.dateFrom || void 0}
+              min={filters.dateFrom || undefined}
               className="date-field-input h-8 w-full bg-background pr-8 text-xs"
             />
             <Button

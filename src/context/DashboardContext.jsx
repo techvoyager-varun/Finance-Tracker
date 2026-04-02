@@ -9,7 +9,7 @@ import {
 import { transactions as initialTransactions } from "@/data/mockData";
 import { useTheme } from "@/hooks/useTheme";
 const DashboardContext = createContext(null);
-const useDashboard = () => {
+export const useDashboard = () => {
   const ctx = useContext(DashboardContext);
   if (!ctx)
     throw new Error("useDashboard must be used within DashboardProvider");
@@ -21,17 +21,21 @@ const loadTransactions = () => {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) return JSON.parse(stored);
-  } catch {}
+  } catch {
+    return initialTransactions;
+  }
   return initialTransactions;
 };
 const loadRole = () => {
   try {
     const stored = localStorage.getItem(ROLE_KEY);
     if (stored === "admin" || stored === "viewer") return stored;
-  } catch {}
+  } catch {
+    return "admin";
+  }
   return "admin";
 };
-const DashboardProvider = ({ children }) => {
+export const DashboardProvider = ({ children }) => {
   const { theme, toggleTheme } = useTheme();
   const [role, setRoleState] = useState(loadRole);
   const [transactions, setTransactions] = useState(loadTransactions);
@@ -82,11 +86,24 @@ const DashboardProvider = ({ children }) => {
     return result;
   }, [transactions, filters]);
   const addTransaction = useCallback((tx) => {
-    setTransactions((prev) => [{ ...tx, id: crypto.randomUUID() }, ...prev]);
+    setTransactions((prev) => [
+      {
+        ...tx,
+        id: crypto.randomUUID(),
+      },
+      ...prev,
+    ]);
   }, []);
   const updateTransaction = useCallback((id, tx) => {
     setTransactions((prev) =>
-      prev.map((t) => (t.id === id ? { ...tx, id } : t)),
+      prev.map((t) =>
+        t.id === id
+          ? {
+              ...tx,
+              id,
+            }
+          : t,
+      ),
     );
   }, []);
   const deleteTransaction = useCallback((id) => {
@@ -127,7 +144,9 @@ const DashboardProvider = ({ children }) => {
         mimeType = "application/json";
         filename = "transactions.json";
       }
-      const blob = new Blob([content], { type: mimeType });
+      const blob = new Blob([content], {
+        type: mimeType,
+      });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
@@ -161,4 +180,3 @@ const DashboardProvider = ({ children }) => {
     </DashboardContext.Provider>
   );
 };
-export { DashboardProvider, useDashboard };

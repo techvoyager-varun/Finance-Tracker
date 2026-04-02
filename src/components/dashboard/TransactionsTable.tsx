@@ -22,9 +22,11 @@ import {
   X,
 } from "lucide-react";
 import { categories, type Transaction } from "@/data/mockData";
-import { useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import AddTransactionDialog from "./AddTransactionDialog";
 import { fmt } from "@/lib/currency";
+
+const PAGE_SIZE = 10;
 
 const TransactionsTable = () => {
   const { role, filteredTransactions, filters, setFilters, deleteTransaction } =
@@ -32,6 +34,7 @@ const TransactionsTable = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingTransaction, setEditingTransaction] =
     useState<Transaction | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
   const fromDateRef = useRef<HTMLInputElement>(null);
   const toDateRef = useRef<HTMLInputElement>(null);
 
@@ -67,6 +70,34 @@ const TransactionsTable = () => {
     filters.category !== "all" ||
     filters.dateFrom ||
     filters.dateTo;
+
+  const totalItems = filteredTransactions.length;
+  const totalPages = Math.max(1, Math.ceil(totalItems / PAGE_SIZE));
+  const pageStart = (currentPage - 1) * PAGE_SIZE;
+  const pageEnd = pageStart + PAGE_SIZE;
+
+  const paginatedTransactions = useMemo(
+    () => filteredTransactions.slice(pageStart, pageEnd),
+    [filteredTransactions, pageStart, pageEnd],
+  );
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [
+    filters.search,
+    filters.type,
+    filters.category,
+    filters.dateFrom,
+    filters.dateTo,
+    filters.sortOrder,
+    filters.sortBy,
+  ]);
+
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [currentPage, totalPages]);
 
   const clearFilters = () => {
     setFilters((f) => ({
@@ -294,7 +325,7 @@ const TransactionsTable = () => {
                 </tr>
               </thead>
               <tbody>
-                {filteredTransactions.map((t) => (
+                {paginatedTransactions.map((t) => (
                   <tr
                     key={t.id}
                     className="border-b border-border last:border-0 hover:bg-muted/30 transition-colors duration-150"
@@ -312,10 +343,10 @@ const TransactionsTable = () => {
                     <td className="py-3 px-3">
                       <Badge
                         variant="outline"
-                        className={`font-normal text-[10px] whitespace-nowrap ${
+                        className={`rounded-md px-2 py-0.5 text-[10px] font-medium leading-none whitespace-nowrap ${
                           t.type === "income"
-                            ? "text-success border-success/30"
-                            : "text-destructive border-destructive/30"
+                            ? "bg-success/10 text-success border-success/30"
+                            : "bg-destructive/10 text-destructive border-destructive/30"
                         }`}
                       >
                         {t.type === "income" ? "Income" : "Expense"}
@@ -324,7 +355,7 @@ const TransactionsTable = () => {
                     <td className="py-3 px-3">
                       <Badge
                         variant="secondary"
-                        className="font-normal text-[10px] whitespace-nowrap"
+                        className="rounded-md border border-border/60 bg-muted/70 px-2 py-0.5 text-[10px] font-medium leading-none whitespace-nowrap text-muted-foreground hover:bg-muted/70"
                       >
                         {t.category}
                       </Badge>
@@ -367,7 +398,7 @@ const TransactionsTable = () => {
 
           {/* Mobile card list */}
           <div className="md:hidden divide-y divide-border">
-            {filteredTransactions.map((t) => (
+            {paginatedTransactions.map((t) => (
               <div
                 key={t.id}
                 className="p-3 hover:bg-muted/30 transition-colors duration-150"
@@ -396,17 +427,17 @@ const TransactionsTable = () => {
                       </span>
                       <Badge
                         variant="outline"
-                        className={`font-normal text-[10px] px-1.5 py-0 whitespace-nowrap ${
+                        className={`rounded-md px-2 py-0.5 text-[10px] font-medium leading-none whitespace-nowrap ${
                           t.type === "income"
-                            ? "text-success border-success/30"
-                            : "text-destructive border-destructive/30"
+                            ? "bg-success/10 text-success border-success/30"
+                            : "bg-destructive/10 text-destructive border-destructive/30"
                         }`}
                       >
                         {t.type === "income" ? "Income" : "Expense"}
                       </Badge>
                       <Badge
                         variant="secondary"
-                        className="font-normal text-[10px] px-1.5 py-0 whitespace-nowrap"
+                        className="rounded-md border border-border/60 bg-muted/70 px-2 py-0.5 text-[10px] font-medium leading-none whitespace-nowrap text-muted-foreground hover:bg-muted/70"
                       >
                         {t.category}
                       </Badge>
@@ -437,6 +468,42 @@ const TransactionsTable = () => {
               </div>
             ))}
           </div>
+
+          {filteredTransactions.length > 0 && (
+            <div className="border-t border-border px-3 py-3 sm:px-4">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <p className="text-[11px] text-muted-foreground">
+                  Showing {pageStart + 1}-{Math.min(pageEnd, totalItems)} of{" "}
+                  {totalItems}
+                </p>
+                <div className="flex items-center justify-between gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-8 px-2.5 text-xs"
+                    onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                    disabled={currentPage === 1}
+                  >
+                    Prev
+                  </Button>
+                  <span className="text-[11px] text-muted-foreground min-w-[72px] text-center">
+                    Page {currentPage}/{totalPages}
+                  </span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-8 px-2.5 text-xs"
+                    onClick={() =>
+                      setCurrentPage((p) => Math.min(totalPages, p + 1))
+                    }
+                    disabled={currentPage === totalPages}
+                  >
+                    Next
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
         </>
       )}
 

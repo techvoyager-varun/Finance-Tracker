@@ -1,28 +1,31 @@
 import { useDashboard } from "@/context/DashboardContext";
 import { Card } from "@/components/ui/card";
 import { fmt } from "@/lib/currency";
+
 const SummaryCards = () => {
   const { totalBalance, totalIncome, totalExpenses } = useDashboard();
+
   const cards = [
     {
       label: "Total Balance",
-      value: fmt(totalBalance),
+      value: totalBalance,
       change: "+12.5%",
-      changePositive: true,
+      tone: "positive",
     },
     {
       label: "Total Income",
-      value: fmt(totalIncome),
+      value: totalIncome,
       change: "+8.2%",
-      changePositive: true,
+      tone: "positive",
     },
     {
       label: "Total Expenses",
-      value: fmt(totalExpenses),
+      value: totalExpenses,
       change: "-3.1%",
-      changePositive: false,
+      tone: "negative",
     },
   ];
+
   return (
     <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-3">
       {cards.map((c, i) => (
@@ -38,10 +41,10 @@ const SummaryCards = () => {
               {c.label}
             </p>
             <p className="text-xl sm:text-2xl font-bold text-card-foreground tracking-tight">
-              {c.value}
+              {fmt(c.value)}
             </p>
             <div
-              className={`text-xs font-medium ${c.changePositive ? "text-success" : "text-destructive"}`}
+              className={`text-xs font-medium ${c.tone === "positive" ? "text-success" : "text-destructive"}`}
             >
               {c.change}
               <span className="text-muted-foreground font-normal ml-1 hidden sm:inline">

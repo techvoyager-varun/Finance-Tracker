@@ -25,7 +25,18 @@ import { categories } from "@/data/mockData";
 import { useEffect, useMemo, useRef, useState } from "react";
 import AddTransactionDialog from "./AddTransactionDialog";
 import { fmt } from "@/lib/currency";
+
 const PAGE_SIZE = 10;
+const DATE_FORMAT_OPTIONS = {
+  month: "short",
+  day: "numeric",
+  year: "2-digit",
+};
+
+const formatDisplayDate = (date) => {
+  return new Date(date).toLocaleDateString("en-IN", DATE_FORMAT_OPTIONS);
+};
+
 const TransactionsTable = () => {
   const { role, filteredTransactions, filters, setFilters, deleteTransaction } =
     useDashboard();
@@ -56,6 +67,14 @@ const TransactionsTable = () => {
       }
     }
   };
+
+  const updateFilters = (partial) => {
+    setFilters((previous) => ({
+      ...previous,
+      ...partial,
+    }));
+  };
+
   const hasActiveFilters =
     filters.search ||
     filters.type !== "all" ||
@@ -87,14 +106,13 @@ const TransactionsTable = () => {
     }
   }, [currentPage, totalPages]);
   const clearFilters = () => {
-    setFilters((f) => ({
-      ...f,
+    updateFilters({
       search: "",
       type: "all",
       category: "all",
       dateFrom: "",
       dateTo: "",
-    }));
+    });
   };
   const openAddDialog = () => {
     setEditingTransaction(null);
@@ -153,23 +171,13 @@ const TransactionsTable = () => {
           <Input
             placeholder="Search..."
             value={filters.search}
-            onChange={(e) =>
-              setFilters((f) => ({
-                ...f,
-                search: e.target.value,
-              }))
-            }
+            onChange={(e) => updateFilters({ search: e.target.value })}
             className="pl-8 h-8 text-xs bg-background"
           />
         </div>
         <Select
           value={filters.type}
-          onValueChange={(v) =>
-            setFilters((f) => ({
-              ...f,
-              type: v,
-            }))
-          }
+          onValueChange={(v) => updateFilters({ type: v })}
         >
           <SelectTrigger className="w-full sm:w-[110px] h-8 text-xs bg-background">
             <SelectValue placeholder="Type" />
@@ -182,12 +190,7 @@ const TransactionsTable = () => {
         </Select>
         <Select
           value={filters.category}
-          onValueChange={(v) =>
-            setFilters((f) => ({
-              ...f,
-              category: v,
-            }))
-          }
+          onValueChange={(v) => updateFilters({ category: v })}
         >
           <SelectTrigger className="w-full sm:w-[130px] h-8 text-xs bg-background">
             <SelectValue placeholder="Category" />
@@ -208,12 +211,7 @@ const TransactionsTable = () => {
               ref={fromDateRef}
               type="date"
               value={filters.dateFrom}
-              onChange={(e) =>
-                setFilters((f) => ({
-                  ...f,
-                  dateFrom: e.target.value,
-                }))
-              }
+              onChange={(e) => updateFilters({ dateFrom: e.target.value })}
               onClick={openNativeDatePicker}
               max={filters.dateTo || undefined}
               className="date-field-input h-8 w-full bg-background pr-8 text-xs"
@@ -234,12 +232,7 @@ const TransactionsTable = () => {
               ref={toDateRef}
               type="date"
               value={filters.dateTo}
-              onChange={(e) =>
-                setFilters((f) => ({
-                  ...f,
-                  dateTo: e.target.value,
-                }))
-              }
+              onChange={(e) => updateFilters({ dateTo: e.target.value })}
               onClick={openNativeDatePicker}
               min={filters.dateFrom || undefined}
               className="date-field-input h-8 w-full bg-background pr-8 text-xs"
@@ -259,10 +252,9 @@ const TransactionsTable = () => {
           variant="outline"
           size="sm"
           onClick={() =>
-            setFilters((f) => ({
-              ...f,
-              sortOrder: f.sortOrder === "asc" ? "desc" : "asc",
-            }))
+            updateFilters({
+              sortOrder: filters.sortOrder === "asc" ? "desc" : "asc",
+            })
           }
           className="h-8 gap-1 text-xs"
         >
@@ -325,11 +317,7 @@ const TransactionsTable = () => {
                     className="border-b border-border last:border-0 hover:bg-muted/30 transition-colors duration-150"
                   >
                     <td className="py-3 px-3 text-xs text-muted-foreground whitespace-nowrap">
-                      {new Date(t.date).toLocaleDateString("en-IN", {
-                        month: "short",
-                        day: "numeric",
-                        year: "2-digit",
-                      })}
+                      {formatDisplayDate(t.date)}
                     </td>
                     <td className="py-3 px-3 font-medium text-card-foreground text-sm truncate">
                       <span className="block truncate">{t.description}</span>
@@ -406,11 +394,7 @@ const TransactionsTable = () => {
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex min-w-0 flex-1 flex-wrap items-center gap-1.5">
                       <span className="text-[10px] text-muted-foreground whitespace-nowrap">
-                        {new Date(t.date).toLocaleDateString("en-IN", {
-                          month: "short",
-                          day: "numeric",
-                          year: "2-digit",
-                        })}
+                        {formatDisplayDate(t.date)}
                       </span>
                       <Badge
                         variant="outline"

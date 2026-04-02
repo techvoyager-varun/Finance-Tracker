@@ -2,32 +2,66 @@ import { useMemo } from "react";
 import { Card } from "@/components/ui/card";
 import { useDashboard } from "@/context/DashboardContext";
 import { fmt } from "@/lib/currency";
+
+const getExpenseTotalsByCategory = (transactions) => {
+  return transactions.reduce((totals, transaction) => {
+    if (transaction.type !== "expense") {
+      return totals;
+    }
+
+    totals[transaction.category] =
+      (totals[transaction.category] || 0) + transaction.amount;
+
+    return totals;
+  }, {});
+};
+
+const getMonthExpenses = (transactions, monthPrefix) => {
+  return transactions.reduce((sum, transaction) => {
+    if (
+      transaction.type !== "expense" ||
+      !transaction.date.startsWith(monthPrefix)
+    ) {
+      return sum;
+    }
+
+    return sum + transaction.amount;
+  }, 0);
+};
+
+const findLargestExpense = (transactions) => {
+  return transactions.reduce((largest, transaction) => {
+    if (transaction.type !== "expense") {
+      return largest;
+    }
+
+    if (!largest || transaction.amount > largest.amount) {
+      return transaction;
+    }
+
+    return largest;
+  }, null);
+};
+
 const InsightsSection = () => {
   const { transactions, totalIncome, totalExpenses } = useDashboard();
   const insights = useMemo(() => {
-    const expenseByCategory = {};
-    transactions
-      .filter((t) => t.type === "expense")
-      .forEach((t) => {
-        expenseByCategory[t.category] =
-          (expenseByCategory[t.category] || 0) + t.amount;
-      });
+    const expenseByCategory = getExpenseTotalsByCategory(transactions);
     const highestCategory = Object.entries(expenseByCategory).sort(
       (a, b) => b[1] - a[1],
     )[0];
-    const aprExpenses = transactions
-      .filter((t) => t.type === "expense" && t.date.startsWith("2025-04"))
-      .reduce((s, t) => s + t.amount, 0);
-    const marExpenses = transactions
-      .filter((t) => t.type === "expense" && t.date.startsWith("2025-03"))
-      .reduce((s, t) => s + t.amount, 0);
+
+    const aprExpenses = getMonthExpenses(transactions, "2025-04");
+    const marExpenses = getMonthExpenses(transactions, "2025-03");
+
     const monthlyChange =
       marExpenses > 0 ? ((aprExpenses - marExpenses) / marExpenses) * 100 : 0;
+
     const savingsRate =
       totalIncome > 0 ? ((totalIncome - totalExpenses) / totalIncome) * 100 : 0;
-    const largestExpense = transactions
-      .filter((t) => t.type === "expense")
-      .sort((a, b) => b.amount - a.amount)[0];
+
+    const largestExpense = findLargestExpense(transactions);
+
     return {
       highestCategory,
       monthlyChange,
@@ -57,7 +91,7 @@ const InsightsSection = () => {
       title: "Largest Expense",
       value: insights.largestExpense?.description || "N/A",
       detail: insights.largestExpense
-        ? `${fmt(insights.largestExpense.amount)} \u2014 ${insights.largestExpense.category}`
+        ? `${fmt(insights.largestExpense.amount)} - ${insights.largestExpense.category}`
         : "",
     },
   ];

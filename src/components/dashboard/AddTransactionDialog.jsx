@@ -17,66 +17,105 @@ import {
 import { Label } from "@/components/ui/label";
 import { useDashboard } from "@/context/DashboardContext";
 import { incomeCategories, expenseCategories } from "@/data/mockData";
+
 const getTodayDate = () => new Date().toISOString().split("T")[0];
-const AddTransactionDialog = ({ open, onOpenChange, transaction }) => {
-  const { addTransaction, updateTransaction } = useDashboard();
-  const [type, setType] = useState("expense");
-  const [description, setDescription] = useState("");
-  const [amount, setAmount] = useState("");
-  const [category, setCategory] = useState("");
-  const [date, setDate] = useState(getTodayDate());
-  const openNativeDatePicker = (input) => {
-    if (!input) return;
-    input.focus();
-    const dateInput = input;
-    if (typeof dateInput.showPicker === "function") {
-      try {
-        dateInput.showPicker();
-      } catch {
-        return;
-      }
-    }
-  };
-  const isEditMode = Boolean(transaction);
-  const resetForm = () => {
-    setType("expense");
-    setDescription("");
-    setAmount("");
-    setCategory("");
-    setDate(getTodayDate());
-  };
-  useEffect(() => {
-    if (!open) return;
-    if (transaction) {
-      setType(transaction.type);
-      setDescription(transaction.description);
-      setAmount(String(transaction.amount));
-      setCategory(transaction.category);
-      setDate(transaction.date);
+
+const defaultFormState = () => ({
+  type: "expense",
+  description: "",
+  amount: "",
+  category: "",
+  date: getTodayDate(),
+});
+
+const openNativeDatePicker = (input) => {
+  if (!input) {
+    return;
+  }
+
+  input.focus();
+
+  if (typeof input.showPicker === "function") {
+    try {
+      input.showPicker();
+    } catch {
       return;
     }
+  }
+};
+
+const AddTransactionDialog = ({ open, onOpenChange, transaction }) => {
+  const { addTransaction, updateTransaction } = useDashboard();
+  const [form, setForm] = useState(defaultFormState);
+
+  const isEditMode = Boolean(transaction);
+
+  const resetForm = () => setForm(defaultFormState());
+
+  const updateForm = (key, value) => {
+    setForm((previous) => ({
+      ...previous,
+      [key]: value,
+    }));
+  };
+
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+
+    if (transaction) {
+      setForm({
+        type: transaction.type,
+        description: transaction.description,
+        amount: String(transaction.amount),
+        category: transaction.category,
+        date: transaction.date,
+      });
+
+      return;
+    }
+
     resetForm();
   }, [open, transaction]);
-  const cats = type === "income" ? incomeCategories : expenseCategories;
+
+  const categories =
+    form.type === "income" ? incomeCategories : expenseCategories;
+
+  const canSubmit =
+    Boolean(form.description.trim()) &&
+    Boolean(form.amount) &&
+    Boolean(form.category) &&
+    Boolean(form.date);
+
   const handleSubmit = () => {
-    if (!description.trim() || !amount || !category || !date) return;
-    const parsedAmount = parseFloat(amount);
-    if (Number.isNaN(parsedAmount)) return;
+    if (!canSubmit) {
+      return;
+    }
+
+    const parsedAmount = parseFloat(form.amount);
+    if (Number.isNaN(parsedAmount)) {
+      return;
+    }
+
     const payload = {
-      date,
-      description: description.trim(),
+      date: form.date,
+      description: form.description.trim(),
       amount: parsedAmount,
-      category,
-      type,
+      category: form.category,
+      type: form.type,
     };
+
     if (transaction) {
       updateTransaction(transaction.id, payload);
     } else {
       addTransaction(payload);
     }
+
     onOpenChange(false);
     resetForm();
   };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[90vh] w-[calc(100%-1rem)] overflow-y-auto p-4 sm:max-w-[420px] sm:p-6">
@@ -90,10 +129,13 @@ const AddTransactionDialog = ({ open, onOpenChange, transaction }) => {
             <div className="space-y-1.5">
               <Label className="text-xs">Type</Label>
               <Select
-                value={type}
+                value={form.type}
                 onValueChange={(v) => {
-                  setType(v);
-                  setCategory("");
+                  setForm((previous) => ({
+                    ...previous,
+                    type: v,
+                    category: "",
+                  }));
                 }}
               >
                 <SelectTrigger>
@@ -109,8 +151,8 @@ const AddTransactionDialog = ({ open, onOpenChange, transaction }) => {
               <Label className="text-xs">Date</Label>
               <Input
                 type="date"
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
+                value={form.date}
+                onChange={(e) => updateForm("date", e.target.value)}
                 onClick={(e) => openNativeDatePicker(e.currentTarget)}
                 onTouchEnd={(e) => openNativeDatePicker(e.currentTarget)}
               />
@@ -120,8 +162,8 @@ const AddTransactionDialog = ({ open, onOpenChange, transaction }) => {
             <Label className="text-xs">Description</Label>
             <Input
               placeholder="e.g. Monthly Salary"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              value={form.description}
+              onChange={(e) => updateForm("description", e.target.value)}
             />
           </div>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -132,18 +174,21 @@ const AddTransactionDialog = ({ open, onOpenChange, transaction }) => {
                 placeholder="0.00"
                 min="0"
                 step="0.01"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
+                value={form.amount}
+                onChange={(e) => updateForm("amount", e.target.value)}
               />
             </div>
             <div className="space-y-1.5">
               <Label className="text-xs">Category</Label>
-              <Select value={category} onValueChange={(v) => setCategory(v)}>
+              <Select
+                value={form.category}
+                onValueChange={(v) => updateForm("category", v)}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="Select" />
                 </SelectTrigger>
                 <SelectContent>
-                  {cats.map((c) => (
+                  {categories.map((c) => (
                     <SelectItem key={c} value={c}>
                       {c}
                     </SelectItem>
@@ -155,7 +200,7 @@ const AddTransactionDialog = ({ open, onOpenChange, transaction }) => {
           <Button
             className="w-full"
             onClick={handleSubmit}
-            disabled={!description.trim() || !amount || !category}
+            disabled={!canSubmit}
           >
             {isEditMode ? "Update Transaction" : "Add Transaction"}
           </Button>

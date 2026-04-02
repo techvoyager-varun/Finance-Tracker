@@ -3,6 +3,7 @@ import { useDashboard } from "@/context/DashboardContext";
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { fmtShort } from "@/lib/currency";
+
 const COLORS = [
   "hsl(217, 91%, 60%)",
   "hsl(142, 71%, 45%)",
@@ -13,25 +14,43 @@ const COLORS = [
   "hsl(160, 60%, 45%)",
   "hsl(30, 80%, 55%)",
 ];
+
+const buildExpenseData = (transactions) => {
+  const totalsByCategory = {};
+
+  transactions.forEach((transaction) => {
+    if (transaction.type !== "expense") {
+      return;
+    }
+
+    totalsByCategory[transaction.category] =
+      (totalsByCategory[transaction.category] || 0) + transaction.amount;
+  });
+
+  return Object.entries(totalsByCategory)
+    .map(([name, value]) => ({ name, value }))
+    .sort((a, b) => b.value - a.value);
+};
+
+const formatPercent = (value, total) => {
+  if (total <= 0) {
+    return "0";
+  }
+
+  return ((value / total) * 100).toFixed(1);
+};
+
 const SpendingBreakdownChart = () => {
   const { transactions } = useDashboard();
   const [selectedIndex, setSelectedIndex] = useState(null);
   const pieContainerRef = useRef(null);
+
   const data = useMemo(() => {
-    const map = {};
-    transactions
-      .filter((t) => t.type === "expense")
-      .forEach((t) => {
-        map[t.category] = (map[t.category] || 0) + t.amount;
-      });
-    return Object.entries(map)
-      .map(([name, value]) => ({
-        name,
-        value,
-      }))
-      .sort((a, b) => b.value - a.value);
+    return buildExpenseData(transactions);
   }, [transactions]);
+
   const total = useMemo(() => data.reduce((s, d) => s + d.value, 0), [data]);
+
   useEffect(() => {
     if (data.length === 0) {
       setSelectedIndex(null);
@@ -41,8 +60,11 @@ const SpendingBreakdownChart = () => {
       prev !== null && prev < data.length ? prev : null,
     );
   }, [data]);
+
   useEffect(() => {
-    if (selectedIndex === null) return;
+    if (selectedIndex === null) {
+      return;
+    }
 
     const handleOutsideClick = (event) => {
       if (!pieContainerRef.current?.contains(event.target)) {
@@ -54,14 +76,20 @@ const SpendingBreakdownChart = () => {
     return () =>
       document.removeEventListener("pointerdown", handleOutsideClick);
   }, [selectedIndex]);
+
   const selectedItem =
     selectedIndex !== null && selectedIndex < data.length
       ? data[selectedIndex]
       : null;
-  const selectedPct =
-    selectedItem && total > 0
-      ? ((selectedItem.value / total) * 100).toFixed(1)
-      : "0";
+
+  const selectedPct = selectedItem
+    ? formatPercent(selectedItem.value, total)
+    : "0";
+
+  const handlePieClick = (_, index) => {
+    setSelectedIndex((current) => (current === index ? null : index));
+  };
+
   return (
     <Card className="p-4 sm:p-5 card-shadow animate-fade-in h-full">
       <div className="flex items-center justify-between mb-4">
@@ -93,7 +121,7 @@ const SpendingBreakdownChart = () => {
                   paddingAngle={3}
                   dataKey="value"
                   rootTabIndex={-1}
-                  onClick={(_, index) => setSelectedIndex(index)}
+                  onClick={handlePieClick}
                 >
                   {data.map((_, i) => (
                     <Cell key={i} fill={COLORS[i % COLORS.length]} />
@@ -112,8 +140,8 @@ const SpendingBreakdownChart = () => {
           )}
           <div className="w-full space-y-1.5 max-h-[120px] overflow-y-auto overflow-x-hidden pr-1">
             {data.map((item, i) => {
-              const pct =
-                total > 0 ? ((item.value / total) * 100).toFixed(1) : "0";
+              const pct = formatPercent(item.value, total);
+
               return (
                 <div
                   key={item.name}

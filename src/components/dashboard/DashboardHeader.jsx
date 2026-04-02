@@ -14,8 +14,23 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+
+const EXPORT_OPTIONS = [
+  {
+    label: "Export CSV",
+    value: "csv",
+  },
+  {
+    label: "Export JSON",
+    value: "json",
+  },
+];
+
 const DashboardHeader = () => {
   const { role, setRole, theme, toggleTheme, exportData } = useDashboard();
+
+  const ThemeIcon = theme === "light" ? Moon : Sun;
+
   return (
     <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between animate-fade-in">
       <div className="flex items-center gap-3">
@@ -40,12 +55,14 @@ const DashboardHeader = () => {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => exportData("csv")}>
-              Export CSV
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => exportData("json")}>
-              Export JSON
-            </DropdownMenuItem>
+            {EXPORT_OPTIONS.map((option) => (
+              <DropdownMenuItem
+                key={option.value}
+                onClick={() => exportData(option.value)}
+              >
+                {option.label}
+              </DropdownMenuItem>
+            ))}
           </DropdownMenuContent>
         </DropdownMenu>
         <Button
@@ -54,13 +71,9 @@ const DashboardHeader = () => {
           className="h-8 w-8 p-0"
           onClick={toggleTheme}
         >
-          {theme === "light" ? (
-            <Moon className="h-3.5 w-3.5" />
-          ) : (
-            <Sun className="h-3.5 w-3.5" />
-          )}
+          <ThemeIcon className="h-3.5 w-3.5" />
         </Button>
-        <Select value={role} onValueChange={(v) => setRole(v)}>
+        <Select value={role} onValueChange={setRole}>
           <SelectTrigger className="w-[120px] sm:w-[140px] h-8 text-xs bg-card">
             <SelectValue />
           </SelectTrigger>

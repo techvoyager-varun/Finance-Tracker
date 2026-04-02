@@ -11,14 +11,30 @@ import {
   ResponsiveContainer,
   Legend,
 } from "recharts";
+
+const CHART_COLORS = {
+  income: "hsl(217, 91%, 60%)",
+  expense: "hsl(0, 84%, 60%)",
+};
+
+const THEME_STYLES = {
+  dark: {
+    gridColor: "hsl(220, 20%, 20%)",
+    tickColor: "hsl(220, 9%, 60%)",
+    tooltipBg: "hsl(222, 47%, 11%)",
+  },
+  light: {
+    gridColor: "hsl(220, 13%, 91%)",
+    tickColor: "hsl(220, 9%, 46%)",
+    tooltipBg: "hsl(0, 0%, 100%)",
+  },
+};
+
 const BalanceTrendChart = () => {
   const { theme } = useDashboard();
-  const gridColor =
-    theme === "dark" ? "hsl(220, 20%, 20%)" : "hsl(220, 13%, 91%)";
-  const tickColor =
-    theme === "dark" ? "hsl(220, 9%, 60%)" : "hsl(220, 9%, 46%)";
-  const tooltipBg =
-    theme === "dark" ? "hsl(222, 47%, 11%)" : "hsl(0, 0%, 100%)";
+  const { gridColor, tickColor, tooltipBg } =
+    theme === "dark" ? THEME_STYLES.dark : THEME_STYLES.light;
+
   return (
     <Card className="p-4 sm:p-5 card-shadow animate-fade-in h-full">
       <div className="flex items-center justify-between mb-4">
@@ -44,24 +60,24 @@ const BalanceTrendChart = () => {
               <linearGradient id="incomeGrad" x1="0" y1="0" x2="0" y2="1">
                 <stop
                   offset="0%"
-                  stopColor="hsl(217, 91%, 60%)"
+                  stopColor={CHART_COLORS.income}
                   stopOpacity={0.3}
                 />
                 <stop
                   offset="100%"
-                  stopColor="hsl(217, 91%, 60%)"
+                  stopColor={CHART_COLORS.income}
                   stopOpacity={0}
                 />
               </linearGradient>
               <linearGradient id="expenseGrad" x1="0" y1="0" x2="0" y2="1">
                 <stop
                   offset="0%"
-                  stopColor="hsl(0, 84%, 60%)"
+                  stopColor={CHART_COLORS.expense}
                   stopOpacity={0.2}
                 />
                 <stop
                   offset="100%"
-                  stopColor="hsl(0, 84%, 60%)"
+                  stopColor={CHART_COLORS.expense}
                   stopOpacity={0}
                 />
               </linearGradient>
@@ -108,7 +124,7 @@ const BalanceTrendChart = () => {
             <Area
               type="monotone"
               dataKey="income"
-              stroke="hsl(217, 91%, 60%)"
+              stroke={CHART_COLORS.income}
               fill="url(#incomeGrad)"
               strokeWidth={2}
               name="Income"
@@ -116,7 +132,7 @@ const BalanceTrendChart = () => {
             <Area
               type="monotone"
               dataKey="expenses"
-              stroke="hsl(0, 84%, 60%)"
+              stroke={CHART_COLORS.expense}
               fill="url(#expenseGrad)"
               strokeWidth={2}
               name="Expenses"

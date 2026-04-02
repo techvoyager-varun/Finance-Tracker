@@ -28,8 +28,8 @@ bun.lock
 bun.lockb
 
 # Testing (not needed in repo)
-playwright-fixture.ts
-playwright.config.ts
+playwright-fixture.js
+playwright.config.js
 test/
 
 # Environment variables

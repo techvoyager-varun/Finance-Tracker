@@ -6,7 +6,8 @@ import SpendingBreakdownChart from "@/components/dashboard/SpendingBreakdownChar
 import TransactionsTable from "@/components/dashboard/TransactionsTable";
 import InsightsSection from "@/components/dashboard/InsightsSection";
 const Index = () => {
-  return <DashboardProvider>
+  return (
+    <DashboardProvider>
       <div className="min-h-screen w-full bg-background transition-colors duration-300">
         <main className="w-full px-4 py-6 sm:px-6 lg:px-8">
           <div className="w-full space-y-6">
@@ -23,6 +24,7 @@ const Index = () => {
           </div>
         </main>
       </div>
-    </DashboardProvider>;
+    </DashboardProvider>
+  );
 };
 export default Index;

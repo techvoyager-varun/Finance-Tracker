@@ -138,7 +138,7 @@ type Transaction = {
 
 Data source:
 
-- local mock data under `src/data/mockData.ts`
+- local mock data under `src/data/mockData.js`
 - no API dependency required
 
 ## Project Structure
@@ -149,15 +149,15 @@ src/
     dashboard/           # Feature-level dashboard components
     ui/                  # Reusable shadcn/ui wrappers
   context/
-    DashboardContext.tsx # Global state and business logic
+    DashboardContext.jsx # Global state and business logic
   data/
-    mockData.ts          # Mock transactions and chart data
+    mockData.js          # Mock transactions and chart data
   hooks/
-    useTheme.ts          # Theme mode handling
+    useTheme.js          # Theme mode handling
   lib/
-    currency.ts          # Currency formatting helpers
+    currency.js          # Currency formatting helpers
   pages/
-    Index.tsx            # Main dashboard composition
+    Index.jsx            # Main dashboard composition
 ```
 
 ## Getting Started

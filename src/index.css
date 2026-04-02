@@ -175,8 +175,6 @@
       0 4px 6px -1px hsl(0 0% 0% / 0.06),
       0 2px 4px -2px hsl(0 0% 0% / 0.04);
   }
-
-  /* Smooth scrollbar */
   .overflow-y-auto::-webkit-scrollbar {
     width: 4px;
   }

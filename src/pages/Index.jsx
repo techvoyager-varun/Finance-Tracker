@@ -1,10 +1,10 @@
-import { DashboardProvider } from "@/context/DashboardContext";
-import DashboardHeader from "@/components/dashboard/DashboardHeader";
-import SummaryCards from "@/components/dashboard/SummaryCards";
-import BalanceTrendChart from "@/components/dashboard/BalanceTrendChart";
-import SpendingBreakdownChart from "@/components/dashboard/SpendingBreakdownChart";
-import TransactionsTable from "@/components/dashboard/TransactionsTable";
-import InsightsSection from "@/components/dashboard/InsightsSection";
+import { DashboardProvider } from '../context/DashboardContext';
+import DashboardHeader from '../components/dashboard/DashboardHeader';
+import SummaryCards from '../components/dashboard/SummaryCards';
+import BalanceTrendChart from '../components/dashboard/BalanceTrendChart';
+import SpendingBreakdownChart from '../components/dashboard/SpendingBreakdownChart';
+import TransactionsTable from '../components/dashboard/TransactionsTable';
+import InsightsSection from '../components/dashboard/InsightsSection';
 const Index = () => {
   return (
     <DashboardProvider>

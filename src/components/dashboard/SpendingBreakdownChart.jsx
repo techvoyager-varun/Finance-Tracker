@@ -1,8 +1,8 @@
-import { Card } from "@/components/ui/card";
-import { useDashboard } from "@/context/DashboardContext";
+import { Card } from '../ui/card';
+import { useDashboard } from '../../context/DashboardContext';
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { fmtShort } from "@/lib/currency";
+import { fmtShort } from '../../lib/currency';
 
 const COLORS = [
   "hsl(217, 91%, 60%)",

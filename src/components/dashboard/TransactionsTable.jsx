@@ -1,15 +1,15 @@
-import { useDashboard } from "@/context/DashboardContext";
-import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import { useDashboard } from '../../context/DashboardContext';
+import { Card } from '../ui/card';
+import { Input } from '../ui/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+} from '../ui/select';
+import { Button } from '../ui/button';
+import { Badge } from '../ui/badge';
 import {
   Search,
   ArrowUpDown,
@@ -21,10 +21,10 @@ import {
   FileText,
   X,
 } from "lucide-react";
-import { categories } from "@/data/mockData";
+import { categories } from '../../data/mockData';
 import { useEffect, useMemo, useRef, useState } from "react";
 import AddTransactionDialog from "./AddTransactionDialog";
-import { fmt } from "@/lib/currency";
+import { fmt } from '../../lib/currency';
 
 const PAGE_SIZE = 10;
 const DATE_FORMAT_OPTIONS = {

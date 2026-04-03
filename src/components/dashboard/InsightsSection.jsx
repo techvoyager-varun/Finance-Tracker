@@ -1,7 +1,7 @@
 import { useMemo } from "react";
-import { Card } from "@/components/ui/card";
-import { useDashboard } from "@/context/DashboardContext";
-import { fmt } from "@/lib/currency";
+import { Card } from '../ui/card';
+import { useDashboard } from '../../context/DashboardContext';
+import { fmt } from '../../lib/currency';
 
 const getExpenseTotalsByCategory = (transactions) => {
   return transactions.reduce((totals, transaction) => {

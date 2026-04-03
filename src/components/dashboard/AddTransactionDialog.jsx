@@ -4,19 +4,19 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+} from '../ui/dialog';
+import { Input } from '../ui/input';
+import { Button } from '../ui/button';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
-import { useDashboard } from "@/context/DashboardContext";
-import { incomeCategories, expenseCategories } from "@/data/mockData";
+} from '../ui/select';
+import { Label } from '../ui/label';
+import { useDashboard } from '../../context/DashboardContext';
+import { incomeCategories, expenseCategories } from '../../data/mockData';
 
 const getTodayDate = () => new Date().toISOString().split("T")[0];
 

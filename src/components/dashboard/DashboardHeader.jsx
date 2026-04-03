@@ -1,19 +1,19 @@
-import { useDashboard } from "@/context/DashboardContext";
+import { useDashboard } from '../../context/DashboardContext';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
+} from '../ui/select';
+import { Button } from '../ui/button';
 import { Moon, Sun, Download, BarChart3 } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from '../ui/dropdown-menu';
 
 const EXPORT_OPTIONS = [
   {

@@ -1,6 +1,6 @@
-import { Card } from "@/components/ui/card";
-import { monthlyBalanceData } from "@/data/mockData";
-import { useDashboard } from "@/context/DashboardContext";
+import { Card } from '../ui/card';
+import { monthlyBalanceData } from '../../data/mockData';
+import { useDashboard } from '../../context/DashboardContext';
 import {
   AreaChart,
   Area,

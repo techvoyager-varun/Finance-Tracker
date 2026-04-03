@@ -4,9 +4,7 @@
     "noImplicitAny": false,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
-    "paths": {
-      "@/*": ["./src/*"]
-    },
+    "paths": {},
     "skipLibCheck": true,
     "strictNullChecks": false
   },

@@ -1,6 +1,6 @@
-import { useDashboard } from "@/context/DashboardContext";
-import { Card } from "@/components/ui/card";
-import { fmt } from "@/lib/currency";
+import { useDashboard } from '../../context/DashboardContext';
+import { Card } from '../ui/card';
+import { fmt } from '../../lib/currency';
 
 const SummaryCards = () => {
   const { totalBalance, totalIncome, totalExpenses } = useDashboard();

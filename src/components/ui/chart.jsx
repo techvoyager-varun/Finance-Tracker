@@ -1,6 +1,6 @@
 import { createContext, forwardRef, useContext, useId, useMemo } from "react";
 import * as RechartsPrimitive from "recharts";
-import { cn } from "@/lib/utils";
+import { cn } from '../../lib/utils';
 const THEMES = {
   light: "",
   dark: ".dark",

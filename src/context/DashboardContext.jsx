@@ -6,8 +6,8 @@ import {
   useMemo,
   useState,
 } from "react";
-import { transactions as initialTransactions } from "@/data/mockData";
-import { useTheme } from "@/hooks/useTheme";
+import { transactions as initialTransactions } from '../data/mockData';
+import { useTheme } from '../hooks/useTheme';
 
 const DashboardContext = createContext(null);
 
